@@ -31,21 +31,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _fetchUserData() async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-    final uid = user.uid;
-    final snapshot = await FirebaseDatabase.instance.ref().child("users").child(uid).get();
-    final data = snapshot.value as Map?;
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      final snapshot =
+          await FirebaseDatabase.instance.ref().child("users").child(uid).get();
+      final data = snapshot.value as Map?;
 
-    setState(() {
-      _email = user.email;
-      _username = data?['name'];
-      _carModel = data?['carModel'];
-      _carColor = data?['carColor'];
-      _carNumber = data?['carNumber'];
-    });
+      setState(() {
+        _email = user.email;
+        _username = data?['name'];
+        _carModel = data?['carModel'];
+        _carColor = data?['carColor'];
+        _carNumber = data?['carNumber'];
+      });
+    }
   }
-}
 
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -161,7 +162,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
@@ -260,7 +260,7 @@ class _HomePageState extends State<HomePage> {
                 style: const TextStyle(color: Colors.white70),
               ),
               subtitle: Text(
-               _carNumber ?? '',
+                _carNumber ?? '',
                 style: const TextStyle(color: Colors.white),
               ),
             ),
