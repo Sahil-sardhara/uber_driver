@@ -36,23 +36,48 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
+  void showLoadingDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => Dialog(
+            backgroundColor: Colors.black87,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(color: Colors.white),
+                  const SizedBox(height: 20),
+                  Text(message, style: const TextStyle(color: Colors.white)),
+                ],
+              ),
+            ),
+          ),
+    );
+  }
+
   void _onRegister() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-      final email = _emailController.text.trim();
-      final password = _passwordController.text.trim();
+      // Show loading dialog
+      showLoadingDialog(context, "Registering your account...");
 
       try {
-        // Firebase Auth Registration
-        final UserCredential userCredential = await FirebaseAuth.instance
+        final email = _emailController.text.trim();
+        final password = _passwordController.text.trim();
+
+        // Try to create user
+        final userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
 
         final uid = userCredential.user!.uid;
 
-        // Save additional data to Realtime Database
-        await FirebaseDatabase.instance.ref().child("users").child(uid).set({
+        // Store user data in Realtime Database
+        await FirebaseDatabase.instance.ref("users/$uid").set({
           "name": _usernameController.text.trim(),
           "email": email,
           "carModel": _carModelController.text.trim(),
@@ -60,30 +85,39 @@ class _RegisterPageState extends State<RegisterPage> {
           "carNumber": _carNumberController.text.trim(),
         });
 
-        // Navigate to HomePage
+        // Close loading dialog
+        Navigator.of(context, rootNavigator: true).pop();
+
+        // Navigate to home
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const HomePage()),
         );
       } on FirebaseAuthException catch (e) {
-        String errorMessage = 'Registration failed';
+        Navigator.of(context, rootNavigator: true).pop(); // Close dialog
+
+        String errorMsg = "Something went wrong.";
         if (e.code == 'email-already-in-use') {
-          errorMessage = 'Email is already in use';
+          errorMsg = "Email already registered.";
         } else if (e.code == 'weak-password') {
-          errorMessage = 'Password is too weak';
+          errorMsg = "Password is too weak.";
+        } else if (e.code == 'invalid-email') {
+          errorMsg = "Invalid email address.";
         }
 
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(errorMessage)));
+        // Show snackbar with error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMsg), backgroundColor: Colors.red),
+        );
       } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Something went wrong')));
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
+        Navigator.of(context, rootNavigator: true).pop(); // Close dialog
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Unexpected error occurred."),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -107,7 +141,6 @@ class _RegisterPageState extends State<RegisterPage> {
         labelText: label,
         prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
         suffixIcon: suffixIcon,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -115,7 +148,6 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -124,6 +156,7 @@ class _RegisterPageState extends State<RegisterPage> {
               key: _formKey,
               child: Column(
                 children: [
+                  Image.asset('assets/images/login_photo.png', height: 120),
                   const Text(
                     'Register',
                     style: TextStyle(
@@ -282,28 +315,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       ],
                     ),
                   ),
-
-                  if (_isLoading)
-                    Container(
-                      color: Colors.black.withOpacity(0.6),
-                      child: const Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(),
-                            SizedBox(height: 16),
-                            Text(
-                              'Registering you to the account',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
                 ],
               ),
             ),
