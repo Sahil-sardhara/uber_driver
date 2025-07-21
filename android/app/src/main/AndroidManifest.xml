@@ -6,6 +6,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
 
@@ -52,6 +57,12 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+
+        <meta-data
+            android:name="com.mappls.sdk.maps.ACCESS_TOKEN"
+            android:value="YOUR_MAPPLS_TOKEN_HERE" />
+    
     </application>
 
     <!-- Required for text processing -->

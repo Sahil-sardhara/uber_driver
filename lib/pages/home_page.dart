@@ -1,12 +1,15 @@
 import 'dart:io';
+import 'package:driver_app/auth/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:driver_app/pages/earnings_page.dart';
-import 'package:driver_app/pages/history_page.dart';
-import 'package:driver_app/pages/settings_page.dart';
 import 'package:flutter/material.dart';
+import 'package:driver_app/main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+import 'earnings_page.dart';
+import 'history_page.dart';
+import 'settings_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -44,6 +47,7 @@ class _HomePageState extends State<HomePage> {
         _carModel = data?['carModel'];
         _carColor = data?['carColor'];
         _carNumber = data?['carNumber'];
+        _isOnline = data?['online'] ?? false;
       });
     }
   }
@@ -139,9 +143,17 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
+                  final newName = controller.text.trim();
+                  final user = FirebaseAuth.instance.currentUser;
+                  if (user != null) {
+                    await FirebaseDatabase.instance
+                        .ref()
+                        .child("users/${user.uid}/name")
+                        .set(newName);
+                  }
                   setState(() {
-                    _username = controller.text.trim();
+                    _username = newName;
                   });
                   Navigator.pop(context);
                 },
@@ -159,9 +171,23 @@ class _HomePageState extends State<HomePage> {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
   }
 
+  void _toggleOnlineStatus(bool val) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await FirebaseDatabase.instance
+          .ref()
+          .child("users/${user.uid}/online")
+          .set(val);
+    }
+    setState(() {
+      _isOnline = val;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
@@ -208,11 +234,14 @@ class _HomePageState extends State<HomePage> {
                     onTap: _editUsername,
                     child: Row(
                       children: [
-                        Text(
-                          _username ?? '',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
+                        Expanded(
+                          child: Text(
+                            _username ?? '',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: 6),
@@ -220,19 +249,19 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   ),
-
                   Text(
                     _email ?? '',
                     style: const TextStyle(color: Colors.white70),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
             ListTile(
               leading: const Icon(Icons.directions_car, color: Colors.white70),
-              title: Text(
+              title: const Text(
                 'Car Model',
-                style: const TextStyle(color: Colors.white70),
+                style: TextStyle(color: Colors.white70),
               ),
               subtitle: Text(
                 _carModel ?? '',
@@ -241,9 +270,9 @@ class _HomePageState extends State<HomePage> {
             ),
             ListTile(
               leading: const Icon(Icons.color_lens, color: Colors.white70),
-              title: Text(
+              title: const Text(
                 'Car Color',
-                style: const TextStyle(color: Colors.white70),
+                style: TextStyle(color: Colors.white70),
               ),
               subtitle: Text(
                 _carColor ?? '',
@@ -255,9 +284,9 @@ class _HomePageState extends State<HomePage> {
                 Icons.confirmation_number,
                 color: Colors.white70,
               ),
-              title: Text(
+              title: const Text(
                 'Car Number',
-                style: const TextStyle(color: Colors.white70),
+                style: TextStyle(color: Colors.white70),
               ),
               subtitle: Text(
                 _carNumber ?? '',
@@ -279,7 +308,7 @@ class _HomePageState extends State<HomePage> {
                 'Trip History',
                 style: TextStyle(color: Colors.white),
               ),
-              onTap: () => _navigateTo(const HistoryPage()),
+              onTap: () => _navigateTo(const TripHistoryPage()),
             ),
             ListTile(
               leading: const Icon(Icons.settings, color: Colors.white),
@@ -287,7 +316,60 @@ class _HomePageState extends State<HomePage> {
                 'Settings',
                 style: TextStyle(color: Colors.white),
               ),
-              onTap: () => _navigateTo(const SettingsPage()),
+              onTap: () => _navigateTo(SettingsPage()),
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text('Logout', style: TextStyle(color: Colors.red)),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder:
+                      (context) => AlertDialog(
+                        backgroundColor: Colors.black87,
+                        title: const Text(
+                          'Confirm Logout',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        content: const Text(
+                          'Do you want to logout?',
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed:
+                                () =>
+                                    Navigator.of(
+                                      context,
+                                    ).pop(), // Closes the dialog
+                            child: const Text(
+                              'No',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              Navigator.of(
+                                context,
+                              ).pop(); // Close the dialog first
+                              await FirebaseAuth.instance.signOut();
+                              if (!mounted) return;
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const LoginPage(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              'Yes',
+                              style: TextStyle(color: Colors.redAccent),
+                            ),
+                          ),
+                        ],
+                      ),
+                );
+              },
             ),
           ],
         ),

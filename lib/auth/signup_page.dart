@@ -21,6 +21,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _carModelController = TextEditingController();
   final _carColorController = TextEditingController();
   final _carNumberController = TextEditingController();
+  final _phoneController = TextEditingController();
 
   bool _obscurePassword = true;
   bool _isLoading = false;
@@ -30,6 +31,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _phoneController.dispose();
     _carModelController.dispose();
     _carColorController.dispose();
     _carNumberController.dispose();
@@ -82,6 +84,7 @@ class _RegisterPageState extends State<RegisterPage> {
           "email": email,
           "carModel": _carModelController.text.trim(),
           "carColor": _carColorController.text.trim(),
+          "PhoneNumber": _phoneController.text.trim(),
           "carNumber": _carNumberController.text.trim(),
         });
 
@@ -158,9 +161,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: [
                   Image.asset('assets/images/login_photo.png', height: 120),
                   const Text(
-                    'Register',
+                    'Register Your account',
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: 25,
                       fontWeight: FontWeight.bold,
                       color: Colors.white70,
                     ),
@@ -179,6 +182,24 @@ class _RegisterPageState extends State<RegisterPage> {
                       return null;
                     },
                   ),
+                  const SizedBox(height: 20),
+
+                  _buildTextField(
+                    label: 'Phone Number',
+                    controller: _phoneController,
+                    prefixIcon: Icons.phone_android,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Phone Number is required';
+                      } else if (value.length != 10 ||
+                          !RegExp(r'^[0-9]+$').hasMatch(value)) {
+                        return 'Enter a valid 10-digit number';
+                      }
+                      return null;
+                    },
+                  ),
+
                   const SizedBox(height: 20),
 
                   // Email
