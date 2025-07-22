@@ -6,11 +6,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.MANAGE_USERS" />
+    <uses-permission android:name="android.permission.CREATE_USERS" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
 
@@ -20,7 +20,17 @@
         android:icon="@mipmap/ic_launcher"
         android:requestLegacyExternalStorage="true">
 
-        <!-- Main activity -->
+        <!-- ✅ Google Maps API Key -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBs1AgYvveBB79LJr7KiGoXKL9G6-R7Jy4" />
+
+        <!-- ✅ Mappls Access Token -->
+        <meta-data
+            android:name="com.mappls.sdk.maps.ACCESS_TOKEN"
+            android:value="YOUR_MAPPLS_TOKEN_HERE" />
+
+        <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -42,7 +52,7 @@
             </intent-filter>
         </activity>
 
-        <!-- ✅ Correct placement of FileProvider -->
+        <!-- File Provider for image selection/upload -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -53,19 +63,13 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <!-- Required for Flutter plugins -->
+        <!-- Flutter plugin metadata -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-
-
-        <meta-data
-            android:name="com.mappls.sdk.maps.ACCESS_TOKEN"
-            android:value="YOUR_MAPPLS_TOKEN_HERE" />
-    
     </application>
 
-    <!-- Required for text processing -->
+    <!-- Intent queries for text handling -->
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT" />
