@@ -23,7 +23,7 @@
         <!-- ✅ Google Maps API Key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBs1AgYvveBB79LJr7KiGoXKL9G6-R7Jy4" />
+            android:value="AlzaSyQ8QdX0RwC6B2e66rP52F4vYURp1NjAVXM" />
 
         <!-- ✅ Mappls Access Token -->
         <meta-data
