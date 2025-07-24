@@ -59,17 +59,11 @@ class _SplashScreenState extends State<SplashScreen>
           opacity: _animation,
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: const [
-              Text(
-                'Movana Driver',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              SizedBox(height: 16),
-              Text(
+            children: [
+              Image.asset('assets/images/logo.JPEG', height: 200),
+
+              const SizedBox(height: 16),
+              const Text(
                 'Let’s get you moving..',
                 style: TextStyle(fontSize: 18, color: Colors.grey),
               ),

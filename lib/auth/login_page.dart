@@ -106,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    Image.asset('assets/images/login_photo.png', height: 140),
+                    Image.asset('assets/images/logo.JPEG', height: 140),
                     const SizedBox(height: 20),
                     const Text(
                       'Movana Driver',

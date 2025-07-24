@@ -159,7 +159,7 @@ class _RegisterPageState extends State<RegisterPage> {
               key: _formKey,
               child: Column(
                 children: [
-                  Image.asset('assets/images/login_photo.png', height: 120),
+                  Image.asset('assets/images/logo.JPEG', height: 120),
                   const Text(
                     'Register Your account',
                     style: TextStyle(
