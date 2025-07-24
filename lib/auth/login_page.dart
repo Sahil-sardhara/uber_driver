@@ -1,3 +1,4 @@
+import 'package:driver_app/auth/forgot_password_screen.dart';
 import 'package:driver_app/auth/signup_page.dart';
 import 'package:driver_app/pages/home_page.dart';
 import 'package:flutter/gestures.dart';
@@ -89,9 +90,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onForgotPassword() {
-    ScaffoldMessenger.of(
+    Navigator.push(
       context,
-    ).showSnackBar(const SnackBar(content: Text('Forgot Password tapped')));
+      MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+    );
   }
 
   @override
